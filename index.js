@@ -1,0 +1,1 @@
+let issue = new Issue()
