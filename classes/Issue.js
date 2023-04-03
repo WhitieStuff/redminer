@@ -255,13 +255,19 @@ class Issue {
     let color_picker = document.createElement('div')
     color_picker.classList.add('rdm-color-picker')
 
-    let button_red = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Red', '#f00', ['rdm-color-picker__button', 'rdm-color-picker__button_red'])
-    let button_green = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Green', '#007f0e', ['rdm-color-picker__button', 'rdm-color-picker__button_green'])
     let button_blue = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Blue', '#0026ff', ['rdm-color-picker__button', 'rdm-color-picker__button_blue'])
-
-    color_picker.appendChild(button_red)
-    color_picker.appendChild(button_green)
+    let button_green = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Green', '#007f0e', ['rdm-color-picker__button', 'rdm-color-picker__button_green'])
+    let button_lime = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Lime', '#00b394', ['rdm-color-picker__button', 'rdm-color-picker__button_lime'])
+    let button_yellow = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Yellow', '#ffd800', ['rdm-color-picker__button', 'rdm-color-picker__button_yellow'])
+    let button_orange = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Orange', '#ff9a56', ['rdm-color-picker__button', 'rdm-color-picker__button_orange'])
+    let button_red = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Red', '#f00', ['rdm-color-picker__button', 'rdm-color-picker__button_red'])
+    
     color_picker.appendChild(button_blue)
+    color_picker.appendChild(button_green)
+    color_picker.appendChild(button_lime)
+    color_picker.appendChild(button_yellow)
+    color_picker.appendChild(button_orange)
+    color_picker.appendChild(button_red)
 
     grand_parent.appendChild(color_picker, parent)
   }
