@@ -184,7 +184,7 @@ class Issue {
     grand_parent.appendChild(link_editor, parent)
   }
 
-  /** Handes the link editor close button. */
+  /** Handes the link editor close cccbutton. */
   handle_close_editor(link_editor, button) {
     button.link_editor_implemented = false
     link_editor.remove()
