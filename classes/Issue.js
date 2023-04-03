@@ -108,10 +108,25 @@ class Issue {
     return button
   }
 
+  /** Returns the selection parts in object. */
+  get_selection_parts(editor_field) {
+    let start = editor_field.selectionStart
+    let end = editor_field.selectionEnd
+    let value = editor_field.value
+
+    let selection = value.substring(start, end)
+    let before = value.substring(0, start)
+    let after = value.substring(end, value.length)
+
+    return { before, selection, after }
+  }
+
   /** Handles the spoiler button click. */
   handle_spoiler_button(editor_field) {
-    let value = '\n{{collapse(Expand)\n\n}}'
-    editor_field.value += value
+    let selection_parts = this.get_selection_parts(editor_field)
+
+    let new_value = `${selection_parts.before}\n{{collapse(Expand)\n${selection_parts.selection}\n}}\n${selection_parts.after}`
+    editor_field.value = new_value
   }
 
   /** Handles the link button click. */
@@ -137,41 +152,20 @@ class Issue {
     let parent = buttons_row.parentNode
     let grand_parent = parent.parentNode
 
+    let selection_parts = this.get_selection_parts(editor_field)
+
     let link_editor = document.createElement('div')
     link_editor.classList.add('rdm-link_editor')
 
-    let link_text_label = document.createElement('label')
-    link_text_label.setAttribute('for', 'link_text')
-    link_text_label.classList.add('rdm-link-editor__link-text-label')
-    link_text_label.innerText = 'Text:'
+    let link_text_label = this.create_editor_label('link_text', 'Text:', ['rdm-link-editor__link-text-label'])
+    let link_text_input = this.create_editor_input('link_text', selection_parts.selection.trim(), ['rdm-link-editor__link-text-input'])
+    let link_href_label = this.create_editor_label('link_href', 'Address:', ['rdm-link-editor__link-href-label'])
+    let link_href_input = this.create_editor_input('link_href', '', ['rdm-link-editor__link-href-input'])
 
-    let link_text_input = document.createElement('input')
-    link_text_input.type = 'text'
-    link_text_input.setAttribute('name', 'link_text')
-    link_text_input.id = 'link_text'
-    link_text_input.classList.add('rdm-link-editor__link-text-input')
+    let paste_button = this.create_editor_button('Paste', ['rdm-link-editor__button', 'rdm-link-editor__button_paste'])
+    paste_button.addEventListener('click', this.handle_paste_button.bind(this, link_editor, editor_field, button, selection_parts))
 
-    let link_href_label = document.createElement('label')
-    link_href_label.setAttribute('for', 'link_href')
-    link_href_label.classList.add('rdm-link-editor__link-href-label')
-    link_href_label.innerText = 'Address:'
-
-    let link_href_input = document.createElement('input')
-    link_href_input.type = 'text'
-    link_href_input.setAttribute('name', 'link_href')
-    link_href_input.id = 'link_href'
-    link_href_input.classList.add('rdm-link-editor__link-href-input')
-
-    let paste_button = document.createElement('button')
-    paste_button.classList.add('rdm-link-editor__button')
-    paste_button.classList.add('rdm-link-editor__button_paste')
-    paste_button.innerText = 'Paste'
-    paste_button.addEventListener('click', this.handle_paste_button.bind(this, link_editor, editor_field, button))
-
-    let cancel_button = document.createElement('button')
-    cancel_button.classList.add('rdm-link-editor__button')
-    cancel_button.classList.add('rdm-link-editor__button_cancel')
-    cancel_button.innerText = 'Cancel'
+    let cancel_button = this.create_editor_button('Cancel', ['rdm-link-editor__button', 'rdm-link-editor__button_cancel'])
     cancel_button.addEventListener('click', this.handle_close_editor.bind(this, link_editor, button))
 
     link_editor.appendChild(link_text_label)
@@ -184,19 +178,58 @@ class Issue {
     grand_parent.appendChild(link_editor, parent)
   }
 
-  /** Handes the link editor close cccbutton. */
+  /** Creates a label with given params. */
+  create_editor_label(label_for = '', label_text = '', label_classes = []) {
+    let label = document.createElement('label')
+    label.setAttribute('for', label_for)
+    label.innerText = label_text
+    label_classes.forEach(label_class => {
+      label.classList.add(label_class)
+    })
+
+    return label
+  }
+
+  /** Creates an input with given params. */
+  create_editor_input(input_id = '', input_value = '', input_classes = []) {
+    let input = document.createElement('input')
+    input.type = 'text'
+    input.setAttribute('name', input_id)
+    input.id = input_id
+    input.value = input_value
+    input_classes.forEach(input_class => {
+      input.classList.add(input_class)
+    })
+
+    return input
+  }
+
+  /** Creates a button with given params. */
+  create_editor_button(text = '', button_classes = []) {
+    let button = document.createElement('button')
+    button_classes.forEach(button_class => {
+      button.classList.add(button_class)
+    })
+    button.innerText = text
+
+    return button
+  }
+
+  /** Handes the link editor close button. */
   handle_close_editor(link_editor, button) {
     button.link_editor_implemented = false
     link_editor.remove()
   }
 
   /** Hanles the link editor save button. */
-  handle_paste_button(link_editor, editor_field, button) {
-    let link_text = link_editor.querySelector('#link_text').value
-    let link_href = link_editor.querySelector('#link_href').value
+  handle_paste_button(link_editor, editor_field, button, selection_parts) {
+    let link_text = link_editor.querySelector('#link_text').value.trim()
+    let link_href = link_editor.querySelector('#link_href').value.trim()
+    // Adds space if the next part does not start with it so the link would be separated.
+    let space = selection_parts.after.match(/^\s/) ? '' : ' '
 
-    let value = `"${link_text}":${link_href}`
-    editor_field.value += value
+    let new_value = `${selection_parts.before}"${link_text}":${link_href}${space}${selection_parts.after}`
+    editor_field.value = new_value
     this.handle_close_editor(link_editor, button)
   }
 
