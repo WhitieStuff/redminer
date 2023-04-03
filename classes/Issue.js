@@ -204,7 +204,7 @@ class Issue {
     return input
   }
 
-  /** Creates a button with given paraffms. */
+  /** Creates a button with given params. */
   create_editor_button(text = '', button_classes = []) {
     let button = document.createElement('button')
     button_classes.forEach(button_class => {
