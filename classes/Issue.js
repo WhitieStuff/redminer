@@ -77,11 +77,13 @@ class Issue {
   /** Adds extra buttons to a form. */
   add_extra_buttons(buttons_row, editor_field) {
     let space = this.create_space()
+    let table_button = this.create_toolbar_button('Table', buttons_row, editor_field, this.handle_table_button)
     let spoiler_button = this.create_toolbar_button('Spoiler', buttons_row, editor_field, this.handle_spoiler_button)
     let link_button = this.create_toolbar_button('Link', buttons_row, editor_field, this.handle_link_button)
     let color_button = this.create_toolbar_button('Color', buttons_row, editor_field, this.handle_color_button)
 
     buttons_row.appendChild(space)
+    buttons_row.appendChild(table_button)
     buttons_row.appendChild(spoiler_button)
     buttons_row.appendChild(link_button)
     buttons_row.appendChild(color_button)
@@ -242,7 +244,7 @@ class Issue {
 
     let new_value = `${selection_parts.before}"${link_text}":${link_href}${space}${selection_parts.after}`
     editor_field.value = new_value
-    
+
     editor_button.classList.remove('rdm-active')
     link_editor.remove()
   }
@@ -256,12 +258,21 @@ class Issue {
     color_picker.classList.add('rdm-color-picker')
 
     let button_blue = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Blue', '#0026ff', ['rdm-color-picker__button', 'rdm-color-picker__button_blue'])
-    let button_green = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Green', '#007f0e', ['rdm-color-picker__button', 'rdm-color-picker__button_green'])
+    let button_green = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Green', '#007f0e', [
+      'rdm-color-picker__button',
+      'rdm-color-picker__button_green'
+    ])
     let button_lime = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Lime', '#00b394', ['rdm-color-picker__button', 'rdm-color-picker__button_lime'])
-    let button_yellow = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Yellow', '#ffd800', ['rdm-color-picker__button', 'rdm-color-picker__button_yellow'])
-    let button_orange = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Orange', '#ff9a56', ['rdm-color-picker__button', 'rdm-color-picker__button_orange'])
+    let button_yellow = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Yellow', '#ffd800', [
+      'rdm-color-picker__button',
+      'rdm-color-picker__button_yellow'
+    ])
+    let button_orange = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Orange', '#ff9a56', [
+      'rdm-color-picker__button',
+      'rdm-color-picker__button_orange'
+    ])
     let button_red = this.create_color_picker_button(color_picker, editor_field, picker_button, 'Red', '#f00', ['rdm-color-picker__button', 'rdm-color-picker__button_red'])
-    
+
     color_picker.appendChild(button_blue)
     color_picker.appendChild(button_green)
     color_picker.appendChild(button_lime)
@@ -295,46 +306,159 @@ class Issue {
 
     let new_value = `${selection_parts.before}${space_before}%{color:${color}}${selection_parts.selection}%${space_after}${selection_parts.after}`
     editor_field.value = new_value
-    
+
     picker_button.classList.remove('rdm-active')
     color_picker.remove()
   }
 
-  // create_modal(type, editor_field) {
-  //   let modal = document.createElement('div')
-  //   modal.classList.add('rdm-modal')
-  //   modal.classList.add(`rdm-modal_${type}`)
-  //   modal.id = `rdm-${type}`
+  /** Handles the table button click. */
+  handle_table_button(editor_field, buttons_row, editor_button) {
+    let old_table_editor = buttons_row.parentNode.parentNode.parentNode.querySelector('.rdm-table-editor')
+    if (old_table_editor) {
+      old_table_editor.remove()
+      editor_button.classList.remove('rdm-active')
+    } else {
+      let table_editor = this.create_table_editor(editor_field, editor_button)
+      editor_button.classList.add('rdm-active')
+    }
+  }
 
-  //   let modal_content = type == 'link' ? this.create_modal_content_link() : this.create_modal_content_table()
+  /** Creates table editor. */
+  create_table_editor(editor_field, editor_button) {
+    let modal = this.create_modal('table', editor_field, editor_button)
+    document.querySelector('body').appendChild(modal)
+  }
 
-  //   let close_button = document.createElement('div')
-  //   close_button.classList.add('rdm-modal__close')
-  //   close_button.innerText = '+'
-  //   close_button.addEventListener('click', this.handle_close_editor.bind(this, modal))
+  /** Creates modal popup. */
+  create_modal(type, editor_field, editor_button) {
+    let modal = document.createElement('div')
+    modal.classList.add('rdm-modal')
+    modal.classList.add(`rdm-table-editor`)
+    modal.id = `rdm-${type}`
 
-  //   let buttons_row = document.createElement('div')
-  //   buttons_row.classList.add('rdm-link-editor__buttons')
+    let modal_content = type == 'table' ? this.create_modal_content_table() : null
 
-  //   let paste_button = document.createElement('button')
-  //   paste_button.classList.add('rdm-link-editor__button')
-  //   paste_button.classList.add('rdm-link-editor__button_paste')
-  //   paste_button.innerText = 'Paste'
-  //   paste_button.addEventListener('click', this.handle_paste_button.bind(this, modal, editor_field))
+    let close_button = document.createElement('div')
+    close_button.classList.add('rdm-modal__close')
+    close_button.innerText = '+'
+    close_button.addEventListener('click', this.handle_close_modal.bind(this, modal, editor_button))
 
-  //   let cancel_button = document.createElement('button')
-  //   cancel_button.classList.add('rdm-link-editor__button')
-  //   cancel_button.classList.add('rdm-link-editor__button_cancel')
-  //   cancel_button.innerText = 'Cancel'
-  //   cancel_button.addEventListener('click', this.handle_close_editor.bind(this, modal))
+    let buttons_row = document.createElement('div')
+    buttons_row.classList.add('rdm-modal__buttons')
 
-  //   buttons_row.appendChild(cancel_button)
-  //   buttons_row.appendChild(paste_button)
-  //   modal_content.appendChild(buttons_row)
-  //   modal.appendChild(modal_content)
-  //   modal.appendChild(close_button)
-  //   document.querySelector('body').appendChild(modal)
-  // }
+    let paste_button = document.createElement('button')
+    paste_button.classList.add('rdm-modal__button')
+    paste_button.classList.add('rdm-modal__button_paste')
+    paste_button.innerText = 'Paste'
+    // paste_button.addEventListener('click', this.handle_paste_button.bind(this, modal, editor_field, editor_button))
 
-  // create_modal_content_table() {}
+    let cancel_button = document.createElement('button')
+    cancel_button.classList.add('rdm-modal__button')
+    cancel_button.classList.add('rdm-modal__button_cancel')
+    cancel_button.innerText = 'Cancel'
+    cancel_button.addEventListener('click', this.handle_close_modal.bind(this, modal, editor_button))
+
+    buttons_row.appendChild(cancel_button)
+    buttons_row.appendChild(paste_button)
+    modal.appendChild(modal_content)
+    modal.appendChild(buttons_row)
+    modal.appendChild(close_button)
+
+    return modal
+  }
+
+  /** Handles modal close button. */
+  handle_close_modal(modal, editor_button) {
+    editor_button.classList.remove('rdm-active')
+    modal.remove()
+  }
+
+  /** Creates table modal content. */
+  create_modal_content_table() {
+    let modal_content = document.createElement('div')
+    modal_content.classList.add('rdm-modal__content')
+    modal_content.classList.add('rdm-modal__table')
+
+    let button_add_row = document.createElement('button')
+    button_add_row.classList.add('rmd-modal__table-add-row')
+    button_add_row.id = 'rmd-add-row'
+    button_add_row.innerText = 'Add row'
+    button_add_row.addEventListener('click', this.hadnle_add_row.bind(this, modal_content))
+
+    modal_content.appendChild(button_add_row)
+
+    this.add_table_row(2, modal_content)
+
+    return modal_content
+  }
+
+  /** Creates and appends a table row. */
+  add_table_row(cells_number, modal_content) {
+    let cell_rows = modal_content.querySelectorAll('.rdm-modal__table-row')
+    if (cell_rows.length >= 20) return
+
+    let table_row = document.createElement('div')
+    table_row.classList.add('rdm-modal__table-row')
+
+    let button_remove_row = document.createElement('button')
+    button_remove_row.classList.add('rmd-modal__table-remove-row')
+    button_remove_row.innerHTML = '-'
+    button_remove_row.addEventListener('click', this.hadnle_remove_row.bind(this, table_row, modal_content))
+
+    table_row.appendChild(button_remove_row)
+
+    for (let i = 0; i < cells_number; i++) {
+      this.add_table_cell(table_row, modal_content)
+    }
+
+    let button_add_column = document.createElement('button')
+    button_add_column.classList.add('rmd-modal__table-add-column')
+    button_add_column.innerHTML = '+'
+    button_add_column.addEventListener('click', this.handle_add_column.bind(this, table_row, modal_content))
+    
+    table_row.appendChild(button_add_column)
+
+    let button_add_row = modal_content.querySelector('#rmd-add-row')
+
+    modal_content.insertBefore(table_row, button_add_row)
+  }
+
+  /** Creates and appends a table cell. */
+  add_table_cell(table_row) {
+    let table_cell = document.createElement('input')
+    table_cell.classList.add('rdm-modal__table-cell')
+
+    table_row.appendChild(table_cell)
+  }
+
+  /** Creates and appends a table column. */
+  add_table_column() {
+    
+  }
+
+  /** Handle the add row button click. */
+  hadnle_add_row(modal_content) {
+    let cell_row = modal_content.querySelector('.rdm-modal__table-row')
+    let cells_number = cell_row.children.length - 2
+
+    this.add_table_row(cells_number, modal_content)
+  }
+  
+  /** Handles the remove row button click. */
+  hadnle_remove_row(table_row, modal_content) {
+    let cell_rows = modal_content.querySelectorAll('.rdm-modal__table-row')
+    if (cell_rows.length < 2) return
+
+    table_row.remove()
+  }
+
+  /** Handles the add column button click. */
+  handle_add_column() {
+    
+  }
+
+  /** Handles the remove column button click. */
+  handle_remove_column() {
+
+  }
 }
