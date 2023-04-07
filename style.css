@@ -107,7 +107,7 @@
 
 .rdm-modal {
   position: fixed;
-  top: 200px;
+  top: 100px;
   left: 40%;
   transform: translate(-50%, 0);
   background-color: #f6f6f6;

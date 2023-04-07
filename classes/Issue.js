@@ -395,7 +395,7 @@ class Issue {
   /** Creates and appends a table row. */
   add_table_row(cells_number, modal_content) {
     let cell_rows = modal_content.querySelectorAll('.rdm-modal__table-row')
-    if (cell_rows.length >= 20) return
+    if (cell_rows.length >= 15) return
 
     let table_row = document.createElement('div')
     table_row.classList.add('rdm-modal__table-row')
@@ -454,7 +454,7 @@ class Issue {
 
   /** Handles the add column button click. */
   handle_add_column() {
-    
+    //123
   }
 
   /** Handles the remove column button click. */
